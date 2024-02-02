@@ -6,7 +6,7 @@ end
 %% canister geometry and physical properties of MH
 
 %canister geometry
-base = load('C:\Users\marco\OneDrive\Documenti\Università - Dottorato\Script Matlab\BaseDesign4_2D1Dcomparison.mat');
+base = load('BaseDesign4_2D1D.mat');
 % data.D      = base.diameter(3);                                            %canister internal diameter
 data.D      = 0.0254;
 data.MH_nodes    = 50;                                                     %by increasing MH_nodes, also N and r must be increased
@@ -59,12 +59,12 @@ data.m_s      = data.V*data.porosity*data.rhoMH;
 data.R        = 8.314;                                                     %ideal gas constant
 
 %% PCM geometry and physical properties
-data.N  = 61;       %n° nodi alla PCM (ca. 61)
+data.N  = 61;       %nÂ° nodi alla PCM (ca. 61)
 data.r  = 40;       %n-esimo nodo corrispondente al fronte (ca. 40)
-data.E  = 0.11;     %raggio esterno PCM (viene corretto più avanti)
+data.E  = 0.11;     %raggio esterno PCM (viene corretto piÃ¹ avanti)
 data.r0 = data.D/2; %raggio interno PCM
 
-data.Nreal = data.N+2*data.MH_nodes+1;                                     %teoricamente +1 ma considero già MH
+data.Nreal = data.N+2*data.MH_nodes+1;                                     %teoricamente +1 ma considero giÃ  MH
 data.rreal = data.r+2*data.MH_nodes+1;
 
 %PCM physical properties
