@@ -45,19 +45,19 @@ end
 
 %% Absorption post-processing
 
-% figure; semilogy(time*d.alfaEff/d.L^2, results.abs.fH_in/(d.alfaEff*d.rhoMH*d.L))
-% ylabel('P^*'); xlabel('Fo')
-% grid
-% 
-% figure; semilogy(results.abs.phi, results.abs.fH_in/(d.alfaEff*d.rhoMH*d.L))
-% ylabel('P^*'); xlabel('\phi')
-% grid
+ figure; semilogy(time*d.alfaEff/d.L^2, results.abs.fH_in*120e6*d.D/(d.alfaEff^3*d.rhoMH*1e18))
+ ylabel('P^*'); xlabel('Fo')
+ grid
+ 
+ figure; semilogy(results.abs.phi, results.abs.fH_in*120e6*d.D/(d.alfaEff^3*d.rhoMH*1e18))
+ ylabel('P^*'); xlabel('\phi')
+ grid
 
-% figure; plot(time/60, results.abs.H2_abs*1e3, 'k', 'LineWidth', 1.0)
-% xlabel('time [min]')
-% ylabel('H_2 absorbed [g]')
-% grid on
-% 
+ figure; plot(time/60, results.abs.H2_abs*1e3, 'k', 'LineWidth', 1.0)
+ xlabel('time [min]')
+ ylabel('H_2 absorbed [g]')
+ grid on
+ 
 % if isreal(y)
 %     idx = find( abs(time-300) == min( abs(time-300) ) );
 %     [rho, L] = meshgrid(linspace(0,d.D/2,d.MH_nodes), [0 d.L/2 d.L]);
