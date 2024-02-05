@@ -66,7 +66,7 @@ options = odeset('NonNegative', 1:d.MH_nodes,...
 
 fprintf('Modeling desorption (Stefan)...')
 
-[t_des, y] = desorptionWithStefanProblem(d, iniC, options, time, cycle);
+[t_des, y] = desorptionWithStefanProblem(d, iniC, options, time);
 t_des = t_des+time(end);
 
 % swap y(101)<->y(102)
