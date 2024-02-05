@@ -18,3 +18,6 @@ Secondary codes:
   absorptionCondition.m and desorptionStefanCondition.m contain the conditions for the 2 numerical simulations to stop (e.g., 99.5% of uptake complete).
 
   BaseDesign.mat contains a preset of 1-kWh canisters layouts with different L/D ratios.
+
+
+FInally, "Sensitivity Analysis.zip" contains the .tikz of the sensitivity analysis.
