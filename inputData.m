@@ -6,12 +6,12 @@ end
 %% canister geometry and physical properties of MH
 
 %canister geometry
-base = load('BaseDesign4_2D1D.mat');
-% data.D      = base.diameter(3);                                            %canister internal diameter
+base = load('BaseDesign.mat');
+% data.D      = base.diameter(3);                                          %canister internal diameter
 data.D      = 0.0254;
-data.MH_nodes    = 50;                                                     %by increasing MH_nodes, also N and r must be increased
+data.MH_nodes    = 50;                                                     %Metal Hydride radial nodes
 data.deltaR = (data.D/2)/(data.MH_nodes-1);
-% data.L      = base.length(3);
+% data.L      = base.length(3);                                            %canister length
 data.L      = data.D*50;
 data.A      = pi*data.D*data.L;
 data.V      = ones(data.MH_nodes,1);                                       %canister internal volume
@@ -28,7 +28,7 @@ data.fV    = 0.25;                                                         %25% 
 data.kMH      = 2.0;                                                       %hydride conductivity
 data.rhoMH    = 7260;
 data.cpMH     = 419;                                                       %hydride specific heat
-data.SC       = 3.0;                                                      %stoichiometric coefficient
+data.SC       = 3.0;                                                       %stoichiometric coefficient
 data.MW_MH    = .432;                                                      %hydride molecular weight
 data.MW_H2    = 0.002;                                                     %hydrogen molecular weight
 data.wt       = data.SC*data.MW_H2/data.MW_MH;                             %gravimetric density
@@ -69,15 +69,15 @@ data.rreal = data.r+2*data.MH_nodes+1;
 
 %PCM physical properties
 data.rhoPCM    = data.rhoMH*0.3;                                          %PCM density
-data.cpPCM     = data.cpMH*4;                                              %PCM specific heat
-data.kS        = data.kMH*0.6;                                                     %PCM conductivity (solid)
+data.cpPCM     = data.cpMH*4;                                             %PCM specific heat
+data.kS        = data.kMH*0.6;                                            %PCM conductivity (solid)
 data.alfaS     = data.kS/(data.rhoPCM*data.cpPCM);
-data.kL        = data.kS;                                                  %PCM conductivity (liquid)
+data.kL        = data.kS;                                                 %PCM conductivity (liquid)
 data.alfaL     = data.kL/(data.rhoPCM*data.cpPCM);
-data.lambdaPCM = 300e3;                                                    %PCM latent heat of fusion
+data.lambdaPCM = 300e3;                                                   %PCM latent heat of fusion
 data.beta      = 9.1e-4;                                                  %PCM thermal expansion coefficient
-data.Tpcm      = 305;                                                      %PCM solidification temperature
-data.mi        = 4e-3 * 1.25;                                                   %PCM dynamic viscosity
+data.Tpcm      = 305;                                                     %PCM solidification temperature
+data.mi        = 4e-3;                                                    %PCM dynamic viscosity
 data.ni        = data.mi/data.rhoPCM;
 data.Pr        = (data.mi*data.cpPCM)/(data.kL);
 
@@ -106,7 +106,7 @@ data.E         = sqrt(data.D^2/4 + ...
 %various
 data.Dvalve = 5e-3;                                                      %discharge valve surface area
 data.Svalve = (pi*data.Dvalve^2/4);
-data.sl     = 0.13;                                                        %slope coefficient
+data.sl     = 0.13;                                                      %slope coefficient
 data.Pin = 30e5;
 data.Pout = 1e5;
 
