@@ -13,11 +13,6 @@ iniC(d.MH_nodes+2:2*d.MH_nodes+1) = d.Tpcm+0.01;
 options = odeset('RelTol', 1e-10, 'AbsTol', 1e-13,...
     'Events', @absorptionCondition);
 
-%% pre-processing window
-preProcess_window(d)
-fprintf('Press any key to continue if the pre-processing window is ok\n')
-pause
-
 %% Absorption
 fprintf('Modeling absorption...')
 
@@ -50,7 +45,7 @@ end
  grid
  
  figure; semilogy(results.abs.phi, results.abs.fH_in*120e6*d.D/(d.alfaEff^3*d.rhoMH*1e18))
- ylabel('P^*'); xlabel('\phi')
+ ylabel('P^*'); xlabel('\phi^*')
  grid
 
  figure; plot(time/60, results.abs.H2_abs*1e3, 'k', 'LineWidth', 1.0)
@@ -58,23 +53,6 @@ end
  ylabel('H_2 absorbed [g]')
  grid on
  
-% if isreal(y)
-%     idx = find( abs(time-300) == min( abs(time-300) ) );
-%     [rho, L] = meshgrid(linspace(0,d.D/2,d.MH_nodes), [0 d.L/2 d.L]);
-%     figure; contourf(rho,L,ones(3,d.MH_nodes).*results.abs.Temperature(idx,:),...
-%         75,'LineStyle', 'none')
-%     colormap(jet)
-%     c = colorbar;
-%     caxis([min(min(results.abs.Temperature)) max(max(results.abs.Temperature))])
-%     axis equal
-%     xticks([0 d.D/2])
-%     yticks([0 d.L])
-%     xlabel('[m]')
-%     ylabel('[m]')
-%     ylabel(c, 'Temperature [K]')
-%     title('Temperature profile at t=300 s')
-% end
-
 %% Desorption with Stefan Problem
 iniC = [...
     ones(1,d.MH_nodes) ...
@@ -86,17 +64,6 @@ iniC = [...
 options = odeset('NonNegative', 1:d.MH_nodes,...
     'RelTol', 1e-12, 'AbsTol', 1e-15, 'Events', @desorptionStefanCondition);
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-WLTP = load('WLTPcycle_class3.mat');                                      %
-cycle.weight = 1000;                                                      %
-cycle.time = WLTP.WLTPcycle_class3(:,1);                                  %
-cycle.speed = WLTP.WLTPcycle_class3(:,2)/3.6;                             %
-cycle.acceleration = gradient(cycle.speed, cycle.time);                   %
-cycle.distance = cumtrapz(cycle.time, cycle.speed);                       %
-cycle.work = cumtrapz(cycle.distance, cycle.weight*cycle.acceleration);   %
-cycle.power = gradient(cycle.work, cycle.time);                           %
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
 fprintf('Modeling desorption (Stefan)...')
 
 [t_des, y] = desorptionWithStefanProblem(d, iniC, options, time, cycle);
@@ -107,7 +74,7 @@ temp = y(:,2*d.MH_nodes+1);
 y(:,2*d.MH_nodes+1) = y(:,2*d.MH_nodes+2);
 y(:,2*d.MH_nodes+2) = temp;
 
-results.des = getResults(y,d,t_des,'des'); %cambiare 50 -> MH_nodes
+results.des = getResults(y,d,t_des,'des');
 
 results.des.H2_des = (1-y(:,1:d.MH_nodes))*d.m_s*d.wt;
 results.des.phi = 1 - (results.des.H2_des)/(d.wt*sum(d.m_s));
@@ -134,38 +101,6 @@ for i = 1:length(t_des)
                     (1 - (d.Pout./results.des.P(i)).^(0.4/1.4)) );
     end
 end
-
-%% Limit to mass flow rate (input control)
-
-% fprintf('Limited flow rate')
-% for i = 1:length(results.des.fH_out)
-%     if results.des.fH_out(i) > (10e3*cos(2*pi/(60)*(t_des(i)-t_des(1)))+10e3)/120e6
-%         results.des.fH_out(i) = (10e3*cos(2*pi/(60)*(t_des(i)-t_des(1)))+10e3)/120e6;
-%     else
-%         results.des.fH_out(i) = results.des.fH_out(i);
-%     end
-% end
-% for i = 1:length(results.des.fH_out)
-%     if (t_des(i)-t_des(1))<data.timeLimit
-%         if results.des.fH_out(i) > rand()*20e3/120e6
-%             results.des.fH_out(i) = rand()*20e3/120e6;
-%         else
-%             results.des.fH_out(i) = results.des.fH_out(i);
-%         end
-%     else
-%     end
-% end
-
-% WLTP cycle class 3 flow rate limitation
-% for i = 1:length(results.des.fH_out)
-%     if results.des.fH_out(i) > interp1(cycle.time, cycle.power, t_des(i)-t_des(1), 'nearest', 'extrap')/120e6
-%         results.des.fH_out(i) = interp1(cycle.time, cycle.power, t_des(i)-t_des(1), 'nearest', 'extrap')/120e6;
-%     end
-%     if interp1(cycle.time, cycle.power, t_des(i)-t_des(1), 'nearest', 'extrap') < 0
-%         results.des.fH_out(i) = 0;
-%     end
-% end
-% clear WLTP
 
 %% global post-processing
 
@@ -198,7 +133,7 @@ set(gca, 'yscale', 'log', 'FontSize',18)
 set(gca, 'xdir', 'reverse')
 
 title('Desorption')
-xlabel('\phi')
+xlabel('\phi^*')
 ylabel('P [kW]')
 
 % dimensional desorption
@@ -211,23 +146,6 @@ figure; plot((t_des-t_des(1))/60, results.des.H2_des*1e3, 'k', 'LineWidth', 1.0)
 xlabel('time [min]')
 ylabel('H_2 desorbed [g]')
 grid on
-
-if isreal(y)
-    idx = find( abs(t_des-t_des(1)-300) == min( abs(t_des-t_des(1)-300) ) );
-    [rho, L] = meshgrid(linspace(0,d.D/2,d.MH_nodes), [0 d.L/2 d.L]);
-    figure; contourf(rho,L,ones(3,d.MH_nodes).*results.des.Temperature(idx,1:d.MH_nodes),...
-        75,'LineStyle', 'none')
-    colormap(jet)
-    c = colorbar;
-    caxis([min(min(results.des.Temperature(:,1:d.MH_nodes))) max(max(results.des.Temperature(:,1:d.MH_nodes)))])
-    axis equal
-    xticks([0 d.D/2])
-    yticks([0 d.L])
-    xlabel('[m]')
-    ylabel('[m]')
-    ylabel(c, 'Temperature [K]')
-    title('Temperature profile at t=300 s')
-end
 
 
 %% clearance
