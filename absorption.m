@@ -24,21 +24,15 @@ function [t, y, absorptionEnd] = absorption(d, iniC, options)
         end
         
         Ra = 9.81*d.beta*abs(d.Tpcm-y(end))*d.L^3*d.Pr/d.ni^2;
-%         Nu = (0.35*Ra^.25)/(1+(.143/d.Pr)^(9/16))^(4/9);
-        St = d.cpPCM*( abs(y(end) - d.Tpcm) )/d.lambdaPCM;
-        Fo = d.alfaL*t/d.L^2;
-        theta = St*Fo;
-        Nu = (2*theta)^-0.5 + (0.35*Ra^0.25 - (2*theta)^-0.5)*(1+(0.0175*Ra^.75*theta^(3/2))^-2)^(1/-2);
+        Nu = (0.35*Ra^.25)/(1+(.143/d.Pr)^(9/16))^(4/9);
         h = Nu*d.kL/d.L;
-%         h = 2500;
 
         dy(1:d.MH_nodes) = d.Ca*exp(-d.Ea./(d.R*y(d.MH_nodes+2:end))).*log(P./Peq).*(1-y(1:d.MH_nodes));
 
         dy(d.MH_nodes+1) = fH_in - ...
             sum( dy(1:d.MH_nodes).*d.m_s*d.wt );
 
-%         Qsource = (-d.deltaH_a*dy(1:d.MH_nodes)*d.rhoMH*d.SC/d.MW_MH)/d.capEff;
-        Qsource = (-d.deltaH_a*dy(1:d.MH_nodes).*d.m_s*d.SC/d.MW_MH)./(d.capEff*d.V);
+        Qsource = (-d.deltaH_a*dy(1:d.MH_nodes)*d.porosity*d.rhoMH*d.SC/d.MW_MH)/d.capEff;
 
         dy(d.MH_nodes+2) = (2*d.alfaEff/d.deltaR^2)*y(d.MH_nodes+2+1) - ...
                 (2*d.alfaEff/d.deltaR^2)*y(d.MH_nodes+2) + ...
