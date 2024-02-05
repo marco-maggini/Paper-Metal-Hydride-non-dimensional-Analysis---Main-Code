@@ -1,6 +1,4 @@
-function [t, y] = desorptionWithStefanProblem(d, iniC, options, time, cycleInfo)
-%%In tutte le variabili, l'ultimo indice va separato per tenere conto del
-%%fatto che y(boundary) == y(102) e non y(101)
+function [t, y] = desorptionWithStefanProblem(d, iniC, options, time)
 
     function dy = desorptionODE(t,y)
         
@@ -28,25 +26,6 @@ function [t, y] = desorptionWithStefanProblem(d, iniC, options, time, cycleInfo)
             fH_out = d.Svalve/(4125*mean([y(d.MH_nodes+2:2*d.MH_nodes); y(2*d.MH_nodes+2)]))*P^(0.4/1.4)*(d.Pout)^(1/1.4)*...
                     sqrt( 2.8/0.4*4125*mean([y(d.MH_nodes+2:2*d.MH_nodes); y(2*d.MH_nodes+2)])*(1 - (d.Pout/P)^(0.4/1.4)) );
         end
-        
-        %ATTIVARE PER RESTRINGERE LA PORTATA (e controllare input)
-%         if fH_out > (10e3*cos(2*pi/(60)*t)+10e3)/120e6
-%             fH_out = (10e3*cos(2*pi/(60)*t)+10e3)/120e6;
-%         end
-%         if t < data.timeLimit
-%             if fH_out > rand()*20e3/120e6
-%                 fH_out = rand()*20e3/120e6;
-%             end
-%         else
-%         end
-
-        % WLTP cycle class 3 flow rate limitation
-%         if fH_out > interp1(cycleInfo.time, cycleInfo.power, t, 'nearest', 'extrap')/120e6
-%             fH_out = interp1(cycleInfo.time, cycleInfo.power, t, 'nearest', 'extrap')/120e6;
-%         end
-%         if interp1(cycleInfo.time, cycleInfo.power, t, 'nearest', 'extrap') < 0
-%             fH_out = 0;
-%         end
             
         for i = 1:d.MH_nodes-1
             if P < Peq(i)
@@ -63,7 +42,7 @@ function [t, y] = desorptionWithStefanProblem(d, iniC, options, time, cycleInfo)
 
         dy(d.MH_nodes+1) = -fH_out - sum( dy(1:d.MH_nodes).*d.m_s*d.SC*d.MW_H2/d.MW_MH );
 
-        Qsource = (d.deltaH_d*dy(1:d.MH_nodes).*d.m_s*d.SC/d.MW_MH)./d.V;
+        Qsource = (d.deltaH_d*dy(1:d.MH_nodes).*d.porosity*d.rhoMH*d.SC/d.MW_MH);
         Qsource = Qsource/( d.capEff );
 
 
